@@ -8,8 +8,8 @@ body {
 }
 
 .inverted {
-  -webkit-filter: invert(1);
-  filter: invert(1);
+  -webkit-filter: invert(1) hue-rotate(-170deg);
+  filter: invert(1) hue-rotate(-170deg);
 }
 
 /* Start the whole page hidden, then we'll show it with JS once

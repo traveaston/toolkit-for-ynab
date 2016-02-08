@@ -1,0 +1,14 @@
+{
+         "name": "richTextMemos",
+         "type": "checkbox",
+      "default": true,
+      "section": "general",
+        "title": "Rich Text Memos",
+  "description": "Allows you to use an inline version of markdown to have bold, italics, and actual links in your memos.",
+      "actions": {
+                    "true": [
+                      "injectScript", "marked-0.3.5/marked.min.js",
+                      "injectScript", "main.js"
+                    ]
+                 }
+}
