@@ -266,6 +266,8 @@
               </div> \
               <div id="reports-filter"> \
                 <h3>Filters</h3> \
+                <span class="reports-filter-name">Accounts</span> \
+                <div id="accounts-filter"></div> \
                 <span class="reports-filter-name">Timeframe</span> \
                 <div id="reports-date-filter"></div> \
               </div> \
