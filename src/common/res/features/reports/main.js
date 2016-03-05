@@ -266,10 +266,14 @@
               </div> \
               <div id="reports-filter"> \
                 <h3>Filters</h3> \
-                <span class="reports-filter-name">Accounts</span> \
-                <div id="accounts-filter"></div> \
-                <span class="reports-filter-name">Timeframe</span> \
-                <div id="reports-date-filter"></div> \
+                <div class="filter-row"> \
+                  <span class="reports-filter-name">Accounts</span> \
+                  <div id="reports-account-filter"></div> \
+                </div> \
+                <div class="filter-row"> \
+                  <span class="reports-filter-name reports-date-filter-name">Timeframe</span> \
+                  <div id="reports-date-filter"></div> \
+                </div> \
               </div> \
               <div id="reports-inspector"> \
                 <div class="reports-inspector-detail"> \
@@ -297,6 +301,85 @@
           // The budget header is absolute positioned
           $('.budget-header, .scroll-wrap').hide();
 
+          // Set up the accounts filter.
+          function buildAccountOptGroup(name, accounts) {
+            if (accounts.length > 0) {
+              var group = $('<optGroup label="' + name + '" name="' + name + '"></optGroup>');
+
+
+
+              accounts.forEach(function(account) {
+                group.append('<option value="' + account.get('entityId') + '">' + account.get('accountName') + '</option>');
+              });
+
+              return group;
+            }
+
+            return '';
+          }
+
+
+          ynab.YNABSharedLib.getBudgetViewModel_SidebarViewModel().then(function(model) {
+
+            function sortAccounts(accounts) {
+              accounts.sort(function(left, right) {
+                if (left.get('sortableIndex') > right.get('sortableIndex')) {
+                  return 1;
+                } else if (left.get('sortableIndex') < right.get('sortableIndex')) {
+                  return -1;
+                }
+
+                return 0;
+              });
+            }
+
+            function mapAccounts(accounts) {
+              return accounts.map(function(account) {
+                return {
+                  id: account.get('entityId'),
+                  text: account.get('accountName')
+                };
+              });
+            }
+
+            var onBudgetAccounts = model.accountsCollection.getOnBudgetAccounts();
+            var offBudgetAccounts = model.accountsCollection.getOffBudgetAccounts();
+            var closedAccounts = model.accountsCollection.getClosedAccounts();
+
+            sortAccounts(onBudgetAccounts);
+            sortAccounts(offBudgetAccounts);
+            sortAccounts(closedAccounts);
+
+            var items = [];
+
+            if (onBudgetAccounts.length > 0) {
+              items.push({
+                text: 'On Budget Accounts',
+                children: mapAccounts(onBudgetAccounts)
+              });
+            }
+
+            if (offBudgetAccounts.length > 0) {
+              items.push({
+                text: 'Tracking Accounts',
+                children: mapAccounts(offBudgetAccounts)
+              });
+            }
+
+            if (closedAccounts.length > 0) {
+              items.push({
+                text: 'Closed Accounts',
+                children: mapAccounts(closedAccounts)
+              });
+            }
+
+            $('#reports-account-filter').selectivity({
+              allowClear: true,
+              items: items,
+              placeholder: 'No accounts selected'
+            });
+          });
+
           ynabToolKit.reports.calculateNetWorthReport().then(function() {
 
             var dateFilter = document.getElementById("reports-date-filter");
@@ -306,7 +389,7 @@
 
             if (start[0] == [start[1]]) {
               // We only have one month. We can't show the filter.
-              $('#reports-filter').hide();
+              $('#reports-date-filter, .reports-date-filter-name').hide();
             } else {
               // Restore the date filter values in case they've gone to another tab and come back.
               var savedStart = sessionStorage.getItem("reportsDateFilter");
